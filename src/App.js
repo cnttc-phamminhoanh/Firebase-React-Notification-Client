@@ -5,11 +5,10 @@ import Button from 'react-bootstrap/Button';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import { toast } from 'react-toastify';
-import { messaging } from './firebaseInit';
+import { messaging, requestFirebaseNotificationDeleteToken, requestFirebaseNotificationGetToken } from './firebaseInit';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.scss';
-import { requestFirebaseNotificationPermission } from './firebaseInit';
 
 const divToken = {
   margin: '40px',
@@ -28,11 +27,19 @@ const divButton = {
 
 const App = () => {
   const [ token, setToken ] = React.useState('');
+  const [ showButtonDelete, setShowButtonDelete ] = React.useState(false);
 
   const getFirebaseToken = async() => {
-    const requestFNP = await requestFirebaseNotificationPermission();
+    const requestFNP = await requestFirebaseNotificationGetToken();
     setToken(requestFNP);
-  }
+    setShowButtonDelete(true);
+  };
+
+  const deleteFirebaseToken = async() => {
+    await requestFirebaseNotificationDeleteToken();
+    setToken('');
+    setShowButtonDelete(false);
+  };
 
   try {
     messaging.onMessage((payload) => {
@@ -40,8 +47,20 @@ const App = () => {
       toast.success(`${title}; ${body}`);
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
+
+  const buttonCurent = () => {
+    if(showButtonDelete) {
+      return (
+        <Button variant="danger" style={{ color: '#fff' }} onClick={() => deleteFirebaseToken()}>Delete Firebase Token</Button>
+      );
+    } else {
+      return (
+        <Button variant="warning" style={{ color: '#fff' }} onClick={() => getFirebaseToken()}>Get Firebase Token</Button>
+      );
+    } 
+  };
 
   return (
     <Fragment>
@@ -58,17 +77,17 @@ const App = () => {
       />
       <Navbar bg="warning" variant="dark">
         <Navbar.Brand href="#home">
-          Firebase notifictations with React and NestJs
+          Firebase notifictations with React
         </Navbar.Brand>
       </Navbar>
 
       <Container className="center-column">
         <Row style = {divButton}>
-          <Button variant="warning" style={{color: '#fff'}} onClick={() => getFirebaseToken()}>Get Firebase Token</Button>{' '}
+          { buttonCurent() }
         </Row>
-          <Col style = {divToken}>
-            { token }
-          </Col>  
+        <Col style = {divToken}>
+          { token }
+        </Col>  
       </Container>
     </Fragment>
   );
