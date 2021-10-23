@@ -18,7 +18,7 @@ export const FirebaseToken = () => {
   try {
     messaging.onMessage((payload) => {
       const { title, body } = payload.data;
-      toast.success(`${title}; ${body}`);
+      toast.success(<div>{ title }<br/> { body }</div>);
     });
   } catch (error) {
     console.log(error);

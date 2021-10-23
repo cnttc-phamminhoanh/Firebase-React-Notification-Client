@@ -17,6 +17,8 @@ firebase.initializeApp(config);
 
 export const messaging = firebase.messaging();
 
+messaging.usePublicVapidKey('BGJlaMx6Jz1uQlRy1WlLTsuNaYNg4F0aF-jl4zKOPPUWK5rg3ukzJYevUlmDifh1g-qs8VK7QsKYC977jNP1he8',);
+
 export const requestFirebaseNotificationGetToken = async () => {
   try {
     const getToken = await messaging.getToken();
